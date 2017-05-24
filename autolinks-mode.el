@@ -1,17 +1,20 @@
-;; Minor mode for auto-linking filenames.
-;; This will scan the directory set in autolinks-mode-dir,
-;; get a list of all the .org files there, and if this mode is enabled,
-;; and you type the name of one of these .org files, it will automatically
-;; treat that as a link, allowing you to quickly jump between files.
+;; Minor mode for auto-linking filenames, inspired by the linking behavior
+;; of Tomboy Notes, notes.vim, and other similar notetaking tools. 
+
+;; This will get a list of all the .org files in the directory set by org-autolinks-dir,
+;; and turn all those filenames into links in the current buffer. 
+;; If you have files called "foo.org" and "bar.org," for instance,
+;; typing "foo" or "bar" should automatically highlight those words as links,
+;; allowing you to click them or press <RET> to jump to those files.
 ;; This can be used to easily make a personal wiki, without having to
 ;; manually enter links to other files. 
 
-;; This is adapted from: 
+;; This code is adapted from: 
 ;;; org-wikinodes.el --- Wiki-like CamelCase links to outline nodes
-
 ;; Copyright (C) 2010-2011 Free Software Foundation, Inc.
 
 ;; Wikinodes author: Carsten Dominik <carsten at orgmode dot org>
+;; Autolinks author: Jonathan Reeve <jon dot reeve at gmail dot com>
 ;; Keywords: outlines, hypermedia, calendar, wp
 ;; Homepage: http://orgmode.org
 ;;
@@ -37,8 +40,8 @@
   (require 'cl))
 
 (defgroup org-autolinks nil
-  "Wiki-like CamelCase links words to outline nodes in Org mode."
-  :tag "Org WikiNodes"
+  "Wiki-like link words or phrases to files in Org mode."
+  :tag "Org AutoLinks"
   :group 'org)
 
 ;; Set directory of files to search for *.org files 
@@ -55,13 +58,11 @@
 (setq org-autolinks-topics
       (mapcar 'file-name-sans-extension org-autolinks-files-bare))
 
+;; Make a regex of all the filenames
 (setq org-autolinks-regex (s-join "\\|" org-autolinks-topics))
 
+;; Debugging
 ;;(describe-variable 'org-autolinks-regex)
-
-;;(defconst org-autolinks-camel-regexp "\\<[A-Z]+[a-z]+[A-Z]+[a-z]+[a-zA-Z]*\\>"
-;;  "Regular expression matching CamelCase words.")
-
 
 (defconst org-autolinks-camel-regexp org-autolinks-regex 
   "Regular expression matching CamelCase words.")
