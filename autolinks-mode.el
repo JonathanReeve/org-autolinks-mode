@@ -1,21 +1,20 @@
 ;; Minor mode for auto-linking filenames, inspired by the linking behavior
-;; of Tomboy Notes, notes.vim, and other similar notetaking tools. 
+;; of Tomboy Notes, notes.vim, and other similar notetaking tools.
 
 ;; This will get a list of all the .org files in the directory set by org-autolinks-dir,
-;; and turn all those filenames into links in the current buffer. 
+;; and turn all those filenames into links in the current buffer.
 ;; If you have files called "foo.org" and "bar.org," for instance,
 ;; typing "foo" or "bar" should automatically highlight those words as links,
 ;; allowing you to click them or press <RET> to jump to those files.
 ;; This can be used to easily make a personal wiki, without having to
-;; manually enter links to other files. 
+;; manually enter links to other files.
 
-;; This code is adapted from: 
+;; This code is adapted from:
 ;;; org-wikinodes.el --- Wiki-like CamelCase links to outline nodes
 ;; Copyright (C) 2010-2011 Free Software Foundation, Inc.
 
 ;; Wikinodes author: Carsten Dominik <carsten at orgmode dot org>
 ;; Autolinks author: Jonathan Reeve <jon dot reeve at gmail dot com>
-;; Keywords: outlines, hypermedia, calendar, wp
 ;; Homepage: http://orgmode.org
 ;;
 ;; This file is part of GNU Emacs.
