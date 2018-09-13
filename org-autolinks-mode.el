@@ -1,3 +1,28 @@
+;;; org-autolinks-mode.el --- Interface for habitica.com
+
+;; Version 0.1
+;; Keywords: org, autolink, wiki
+;; URL: https://github.com/JonathanReeve/org-autolinks-mode
+;; License: GNU General Public License >= 3
+;; Package-Requires: ((org "9.0") (emacs "24.3"))
+
+;; This file is not part of GNU Emacs.
+
+;; This program is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
 ;; Minor mode for auto-linking filenames, inspired by the linking behavior
 ;; of Tomboy Notes, notes.vim, and other similar notetaking tools.
 
@@ -9,34 +34,22 @@
 ;; This can be used to easily make a personal wiki, without having to
 ;; manually enter links to other files.
 
-;; This code is adapted from:
-;;; org-wikinodes.el --- Wiki-like CamelCase links to outline nodes
-;; Copyright (C) 2010-2011 Free Software Foundation, Inc.
+;; By default org-autolinks-dir will default to org-directory
 
-;; Wikinodes author: Carsten Dominik <carsten at orgmode dot org>
-;; Autolinks author: Jonathan Reeve <jon dot reeve at gmail dot com>
-;; Homepage: http://orgmode.org
+;;; Recommended Usage:
 ;;
-;; This file is part of GNU Emacs.
-;;
-;; GNU Emacs is free software: you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; GNU Emacs is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with GNU Emacs.  If not, see <http://www.gnu.org/licenses/>.
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 ;; (add-hook 'org-mode-hook 'org-autolinks-mode)
 ;; (add-hook 'before-save-hook 'org-autolinks-before-save)
+;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;; Code:
 
 (require 'org)
+
+(defvar org-autolinks-dir org-directory)
 
 (defun org-autolink-store ()
   "Add an autolink store function."
@@ -53,16 +66,6 @@
 PATH is the file path."
   (find-file path))
 
-(org-link-set-parameters
- "autolink" :follow 'org-autolinks-open :store 'org-autolink-store)
-
-(defun org-autolinks-upsert-links ()
-  "Remove all autolinks and recreate them."
-  (interactive)
-  (let ((filenames (directory-files-recursively org-directory ".org$")))
-    (org-autolinks--clear-links filenames)
-    (org-autolinks--convert-to-links filenames)))
-
 (defun org-autolinks--clear-links (filenames)
   "Remove all autolinks.
 
@@ -77,7 +80,7 @@ FILENAMES is the list of org files paths."
   "Create a regex to find all autolinks given the list of org file paths.
 
 FILENAMES is the list of org files paths."
-  (concat "\\[\\[autolink:.*\\]\\[\\("
+  (concat "\\[\\[autolink:[^ ]+\\]\\[\\("
           (mapconcat 'file-name-base filenames "\\|")
           "\\)\\]\\]"))
 
@@ -99,9 +102,9 @@ FILENAMES is the list of org files paths."
   "Create a regex to find all expression matching an org filename.
 
 FILENAMES is the list of org files paths."
-  (concat "[^\[]\\("
+  (concat "\\("
           (mapconcat 'file-name-base filenames "\\|")
-          "\\)[^\[]"))
+          "\\)"))
 
 (defun org-autolinks--path-from-name (filenames basename)
   "Find org file path from name.
@@ -116,15 +119,26 @@ BASENAME is the expression we are trying to match."
 
 (defun org-autolinks-before-save ()
   "Run autolinks-upsert given that you are in org mode."
-  (when (eq major-mode 'org-mode)
+  (when (and (and (boundp 'org-autolinks-mode) org-autolinks-mode) (eq major-mode 'org-mode))
     (org-autolinks-upsert-links)))
 
-;;;###autoload
-(define-minor-mode org-autolinks-mode
-  "Mode to autolink org file based on filename")
-
+;; on org-autolinks-mode, trigger the format
 (add-hook 'org-autolinks-mode-hook 'org-autolinks-before-save)
 
+;; adds the autolink as a type of external link to org-mode
+(org-link-set-parameters
+ "autolink" :follow 'org-autolinks-open :store 'org-autolink-store)
+
+;;;###autoload
+(defun org-autolinks-upsert-links ()
+  "Remove all autolinks and recreate them."
+  (interactive)
+  (let ((filenames (directory-files-recursively org-autolinks-dir ".org$")))
+    (org-autolinks--clear-links filenames)
+    (org-autolinks--convert-to-links filenames)))
+
+(define-minor-mode org-autolinks-mode
+  "Mode to autolink org file based on filename")
 
 (provide 'org-autolinks-mode)
 ;;; org-autolinks-mode.el ends here
