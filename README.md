@@ -13,7 +13,7 @@ This can be used to easily make a personal wiki, without having to
 manually enter links to other files.
 
 ## Installation
-Load the file =org-autolinks-mode.el= from this repo and
+Load the file `org-autolinks-mode.el` from this repo and
 ```lisp
 (require 'org-autolinks-mode)
 ```
@@ -31,7 +31,7 @@ You should also be able to run the parser on load and on save with
 
 
 ## Customize
-By default =org-autolinks-dir= is set to =org-dir=. Feel free to change that
+By default `org-autolinks-dir` is set to `org-dir`. Feel free to change that
 ```lisp
 (setq org-autolinks-dir "/some/other/directory")
 ```
